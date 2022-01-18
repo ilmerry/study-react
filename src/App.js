@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Average from "./Average";
 import Counter from "./Counter";
 
 class App extends Component {
