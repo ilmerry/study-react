@@ -1,65 +1,96 @@
-import React, { useState, useRef, useCallback } from 'react';
-import TodoInsert from './todo-app/components/TodoInsert';
-import TodoList from './todo-app/components/TodoList';
-import TodoTemplate from './todo-app/components/TodoTemplate';
-
-// 다량의 데이터 생성
-function createBulkTodos() {
-  const array = [];
-  for (let i = 1; i <= 2500; i++) {
-    array.push({
-      id: i,
-      text: `할 일 ${i}`,
-      checked: false,
-    });
-  }
-  return array;
-}
+import React, { useRef, useCallback, useState } from 'react';
+import produce from 'immer';
 
 const App = () => {
-  const [todos, setTodos] = useState(createBulkTodos);
+  const nextId = useRef(1);
+  const [form, setForm] = useState({ name: '', username: '' });
+  const [data, setData] = useState({
+    array: [],
+    uselessValue: null,
+  });
 
-  // 고윳값으로 사용될 id는 ref를 사용하자
-  const nextId = useRef(4);
-
-  // todos 값이 바뀌었을 때 todo를 기존 배열에 insert한다
-  const onInsert = useCallback(
-    (text) => {
-      const todo = {
-        id: nextId.current,
-        text,
-        checked: false,
-      };
-      setTodos((todos) => todos.concat(todo));
-      nextId.current += 1;
-    },
-    [todos],
-  );
-
-  const onRemove = useCallback(
-    (id) => {
-      setTodos((todos) => todos.filter((todo) => todo.id !== id));
-    },
-    [todos],
-  );
-
-  // 체크박스 누르면 스타일 바뀜
-  const onToggle = useCallback(
-    (id) => {
-      setTodos((todos) =>
-        todos.map((todo) =>
-          todo.id === id ? { ...todo, checked: !todo.checked } : todo,
-        ),
+  // input 수정을 위한 함수
+  const onChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+      setForm(
+        produce((draft) => {
+          draft[name] = value;
+        }),
       );
     },
-    [todos],
+    [form],
+  );
+
+  // form 둥록을 위한 함수
+  const onSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      const info = {
+        id: nextId.current,
+        name: form.name,
+        username: form.username,
+      };
+
+      // array에 새 항목 등록
+      setData(
+        produce((draft) => {
+          draft.array.push(info);
+        }),
+      );
+
+      // form 초기화
+      setForm({
+        name: '',
+        username: '',
+      });
+      nextId.current += 1;
+    },
+    [data, form.name, form.username],
+  );
+
+  // 항목을 삭제하는 함수
+  const onRemove = useCallback(
+    (id) => {
+      setData(
+        produce((draft) => {
+          draft.array.splice(
+            draft.array.findIndex((info) => info.id === id),
+            1,
+          );
+        }),
+      );
+    },
+    [data],
   );
 
   return (
-    <TodoTemplate>
-      <TodoInsert onInsert={onInsert} />
-      <TodoList todos={todos} onRemove={onRemove} onToggle={onToggle} />
-    </TodoTemplate>
+    <div>
+      <form onSubmit={onSubmit}>
+        <input
+          name="username"
+          placeholder="아이디"
+          value={form.username}
+          onChange={onChange}
+        />
+        <input
+          name="name"
+          placeholder="이름"
+          value={form.name}
+          onChange={onChange}
+        />
+        <button type="submit">등록</button>
+      </form>
+      <div>
+        <ul>
+          {data.array.map((info) => (
+            <li key={info.id} onClick={() => onRemove(info.id)}>
+              {info.username} ({info.name})
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 };
 
