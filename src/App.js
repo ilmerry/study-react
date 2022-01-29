@@ -1,37 +1,25 @@
-import React from 'react';
-import About from './router-tutorial/About';
-import Home from './router-tutorial/Home';
-import { Link, Route, Routes } from '../node_modules/react-router-dom/index';
-import Profile from './router-tutorial/Profile';
-import Profiles from './router-tutorial/Profiles';
-import HistorySample from './router-tutorial/HistorySample';
+// newsapi password :: studyingreact9284
+// API :: 4c858a1b67a747289b7d4d56bc82784a
+import React, { useState, useCallback } from 'react';
+import { Route, Routes, useParams } from '../node_modules/react-router/index';
+import Categories from './news-app/Categories';
+import NewsList from './news-app/NewsList';
+import NewsPage from './news-app/NewsPage';
 
 const App = () => {
   return (
-    <div>
-      <ul>
-        <li>
-          <Link to="/">홈</Link>
-        </li>
-        <li>
-          <Link to="/about">소개</Link>
-        </li>
-        <li>
-          <Link to="/profiles">프로필</Link>
-        </li>
-        <li>
-          <Link to="/history">History 예제</Link>
-        </li>
-      </ul>
-      <hr />
-      <Routes>
-        <Route path="/" element={<Home />} exact={true} />
-        <Route path="/about" element={<About />} />
-        <Route path="/profiles" element={<Profiles />} />
-        <Route path="/profiles/:username" element={<Profile />} />
-        <Route path="/history" element={<HistorySample />} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/" element={<NewsPage />} exact={true} />
+      <Route path="/business" element={<NewsPage match={'business'} />} />
+      <Route
+        path="/entertainment"
+        element={<NewsPage match={'entertainment'} />}
+      />
+      <Route path="/health" element={<NewsPage match={'health'} />} />
+      <Route path="/science" element={<NewsPage match={'science'} />} />
+      <Route path="/sports" element={<NewsPage match={'sports'} />} />
+      <Route path="/technology" element={<NewsPage match={'technology'} />} />
+    </Routes>
   );
 };
 
