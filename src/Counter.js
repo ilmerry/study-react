@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState } from 'react';
 
 function reducer(state, action) {
   console.log(parseInt(action.value));
