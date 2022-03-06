@@ -1,5 +1,6 @@
 import Router from './Router';
-import { createGlobalStyle } from "styled-components"
+import { createGlobalStyle } from 'styled-components';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 // Reset Style
 const GlobalStyle = createGlobalStyle`
@@ -64,13 +65,16 @@ a {
   text-decoration: none;
   color: inherit;
 }
-`
+`;
 
-function App(){
-  return <>
-    <GlobalStyle/>
-    <Router />
-  </>
+function App() {
+  return (
+    <>
+      <GlobalStyle />
+      <Router />
+      <ReactQueryDevtools initialIsOpen={true} />
+    </>
+  );
 }
 
-export default App
+export default App;
