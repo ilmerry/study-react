@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { Helmet } from 'react-helmet';
 import {
   Switch,
   Route,
@@ -83,6 +84,17 @@ const Description = styled.p`
   margin: 20px 0px;
 `;
 
+const Button = styled.div`
+  margin: 25px 150px;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 14px 0px;
+  border-radius: 10px;
+`;
+
 interface IRouteParams {
   coinId: string;
 }
@@ -158,18 +170,29 @@ function Coin() {
   );
   const { isLoading: tickersLoading, data: tickersData } = useQuery<IPriceData>(
     ['tickers', coinId],
-    () => fetchCoinTickers(coinId),
+    () => fetchCoinTickers(coinId),{
+      // 5초마다 리렌더링
+      refetchInterval: 5000
+    }
   );
 
   const loading = infoLoading || tickersLoading;
 
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name ? state.name : loading ? 'Loading...' : infoData?.name}
+        </title>
+      </Helmet>
       <Header>
         <Title>
           {state?.name ? state.name : loading ? 'Loading...' : infoData?.name}
         </Title>
       </Header>
+      <Button>
+        <Link to={'/'}>⬅️ Go Home</Link>
+      </Button>
       {loading ? (
         <Loader>Loading...</Loader>
       ) : (
@@ -184,8 +207,8 @@ function Coin() {
               <span>${infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{infoData?.open_source ? 'Yes' : 'No'}</span>
+              <span>Price:</span>
+              <span>${tickersData?.quotes.USD.price.toFixed(3)}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>
@@ -214,7 +237,7 @@ function Coin() {
               <Chart coinId={coinId}/>
             </Route>
             <Route path={`/:coinId/price`}>
-              <Price />
+              <Price coinId={coinId}/>
             </Route>
           </Switch>
         </>
