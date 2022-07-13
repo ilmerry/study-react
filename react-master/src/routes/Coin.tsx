@@ -161,8 +161,8 @@ interface IPriceData {
 function Coin() {
   const { coinId } = useParams<IRouteParams>();
   const { state } = useLocation<IRouteState>();
-  const priceMatch = useRouteMatch('/:coinId/price');
-  const chartMatch = useRouteMatch('/:coinId/chart');
+  const priceMatch = useRouteMatch('/study-react/:coinId/price');
+  const chartMatch = useRouteMatch('/study-react/:coinId/chart');
   // coinId는 고유해야하기 때문에, 배열 첫번째 요소로 구분자 넣어줌
   const { isLoading: infoLoading, data: infoData } = useQuery<IInfoData>(
     ['info', coinId],
@@ -191,7 +191,7 @@ function Coin() {
         </Title>
       </Header>
       <Button>
-        <Link to={'/'}>⬅️ Go Home</Link>
+        <Link to={'/study-react/'}>⬅️ Go Home</Link>
       </Button>
       {loading ? (
         <Loader>Loading...</Loader>
@@ -225,18 +225,18 @@ function Coin() {
 
           <Tabs>
             <Tab isActive={chartMatch !== null}>
-              <Link to={`/${coinId}/chart`}>Chart</Link>
+              <Link to={`/study-react/${coinId}/chart`}>Chart</Link>
             </Tab>
             <Tab isActive={priceMatch !== null}>
-              <Link to={`/${coinId}/price`}>Price</Link>
+              <Link to={`/study-react/${coinId}/price`}>Price</Link>
             </Tab>
           </Tabs>
 
           <Switch>
-            <Route path={`/:coinId/chart`}>
+            <Route path={`/study-react/:coinId/chart`}>
               <Chart coinId={coinId}/>
             </Route>
-            <Route path={`/:coinId/price`}>
+            <Route path={`/study-react/:coinId/price`}>
               <Price coinId={coinId}/>
             </Route>
           </Switch>
