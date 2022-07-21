@@ -2,7 +2,7 @@ import Router from './Router';
 import { createGlobalStyle } from 'styled-components';
 import { useRecoilValue } from 'recoil';
 import { isDarkAtom } from './atoms';
-import ToDoList from './ToDoList';
+import ToDoList from './components/ToDoList';
 
 // Reset Style
 const GlobalStyle = createGlobalStyle`
