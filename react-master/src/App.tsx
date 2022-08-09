@@ -1,8 +1,7 @@
 import Router from './Router';
 import { createGlobalStyle } from 'styled-components';
-import { useRecoilValue } from 'recoil';
-import { isDarkAtom } from './atoms';
-import ToDoList from './components/ToDoList';
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
 
 // Reset Style
 const GlobalStyle = createGlobalStyle`
@@ -70,13 +69,25 @@ a {
 `;
 
 function App() {
-  const isDark = useRecoilValue(isDarkAtom)
+  const onDragEnd = () => {};
 
   return (
-    <>
-        <GlobalStyle />
-        <ToDoList />
-    </>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div>
+        <Droppable droppableId="one">
+          {() => (
+            <ul>
+              <Draggable draggableId="first" index={0}>
+                {() => <li>One</li>}
+              </Draggable>
+              <Draggable draggableId="second" index={1}>
+                {() => <li>Two</li>}
+              </Draggable>
+            </ul>
+          )}
+        </Droppable>
+      </div>
+    </DragDropContext>
   );
 }
 
