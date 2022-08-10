@@ -9,12 +9,12 @@ import {
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { toDoState } from './atoms';
-import DraggableCard from './components/DraggableCard';
+import Board from './components/Board';
 
 const Wrapper = styled.div`
   display: flex;
-  max-width: 480px;
-  width: 100%;
+  max-width: 680px;
+  width: 100vw;
   margin: 0 auto;
   justify-content: center;
   align-items: center;
@@ -22,20 +22,65 @@ const Wrapper = styled.div`
 `;
 
 const Boards = styled.div`
-  display: grid;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   width: 100%;
-  grid-template-columns: repeat(1, 1fr);
+  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
 `;
 
-const Board = styled.div`
-  padding: 20px 10px;
-  padding-top: 30px;
-  background-color: #E4E9BE;
-  border-radius: 5px;
-  min-height: 200px;
-`;
+function App() {
+  const [toDos, setToDos] = useRecoilState(toDoState);
+  const onDragEnd = (info: DropResult) => {
+    console.log(info);
+    const { destination, draggableId, source } = info;
+    if (!destination) return;
+    if (destination?.droppableId === source.droppableId) {
+      // same board movement.
+      setToDos((allBoards) => {
+        const boardCopy = [...allBoards[source.droppableId]];
+        boardCopy.splice(source.index, 1);
+        boardCopy.splice(destination?.index, 0, draggableId);
+        return {
+          ...allBoards,
+          [source.droppableId]: boardCopy,
+        };
+      });
+    }
+    if (destination.droppableId !== source.droppableId) {
+      // cross board movement
+      setToDos((allBoards) => {
+        const sourceBoard = [...allBoards[source.droppableId]];
+        const destinationBoard = [...allBoards[destination.droppableId]];
+        sourceBoard.splice(source.index, 1);
+        destinationBoard.splice(destination?.index, 0, draggableId);
+        return {
+          ...allBoards,
+          [source.droppableId]: sourceBoard,
+          [destination.droppableId]: destinationBoard,
+        };
+      });
+    }
+  }
+  return (
+  <>
+    <GlobalStyle/>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Wrapper>
+        <Boards>
+          {Object.keys(toDos).map((boardId) => (
+            <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
+          ))}
+        </Boards>
+      </Wrapper>
+    </DragDropContext>
+  </>
+  );
+}
 
-// Reset Style
+export default App;
+
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
 html, body, div, span, applet, object, iframe,
@@ -99,42 +144,3 @@ a {
   color: inherit;
 }
 `;
-
-function App() {
-  const [toDos, setToDos] = useRecoilState(toDoState);
-  const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
-    if (!destination) return;
-    setToDos((oldToDos) => {
-      const toDosCopy = [...oldToDos];
-      // 1) Delete item on source.index
-      toDosCopy.splice(source.index, 1);
-      // 2) Put back the item on the destination.index=
-      toDosCopy.splice(destination?.index, 0, draggableId);
-      return toDosCopy;
-    });
-  };
-
-  return (
-    <>
-      <GlobalStyle/>
-      <DragDropContext onDragEnd={onDragEnd}>
-      <Wrapper>
-        <Boards>
-          <Droppable droppableId="one">
-            {(magic) => (
-              <Board ref={magic.innerRef} {...magic.droppableProps}>
-                {toDos.map((toDo, index) => (
-                  <DraggableCard key={toDo} index={index} toDo={toDo} />
-                ))}
-                {magic.placeholder}
-              </Board>
-            )}
-          </Droppable>
-        </Boards>
-      </Wrapper>
-      </DragDropContext>
-    </>
-  );
-}
-
-export default App;
