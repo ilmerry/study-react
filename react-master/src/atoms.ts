@@ -5,16 +5,21 @@ export const isDarkAtom = atom({
 	default: false,
 })
 
+export interface ITodo {
+	id: number;
+	text: string;
+  }
+
 // for KanBan
 interface IToDoState {
-	[key: string]: string[];
+	[key: string]: ITodo[];
 }
   
 export const toDoState = atom<IToDoState>({
 	key: "toDo",
 	default: {
-		to_do: ["a", "b"],
-		doing: ["c", "d", "e"],
-		done: ["f"],
+		"To Do": [],
+		Doing: [],
+		Done: [],
 	  },
 });
