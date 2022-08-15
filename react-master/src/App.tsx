@@ -10,6 +10,8 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { toDoState } from './atoms';
 import Board from './components/Board';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 const Wrapper = styled.div`
   display: flex;
@@ -30,10 +32,36 @@ const Boards = styled.div`
   grid-template-columns: repeat(3, 1fr);
 `;
 
+const Form = styled.form`
+  background-color: ${(props) => props.theme.accentColor};
+  input {
+    width: 100%;
+  };
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 5px;
+`;
+
+const Button = styled.button`
+  background-color: transparent;
+  cursor: pointer;
+  border: none;
+  font-size: 15px;
+  margin-top: 5px;
+`
+
+interface IForm {
+  category: string;
+}
+
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const { register, setValue, handleSubmit } = useForm<IForm>();
+
   const onDragEnd = (info: DropResult) => {
-    console.log(info);
     const { destination, draggableId, source } = info;
     if (!destination) return;
     if (destination?.droppableId === source.droppableId) {
@@ -65,6 +93,24 @@ function App() {
       });
     }
   }
+
+  const onValid = ({ category }: IForm) => {
+    setToDos((allBoards) => {
+      return {
+        ...allBoards,
+        [category]: [],
+      };
+    });
+    setValue("category", "");
+  }
+
+  useEffect(() => {
+    Object.keys(toDos).map((key) => {
+      localStorage.setItem(key, JSON.stringify(toDos[key]));
+      console.log(JSON.parse(localStorage.getItem(key) as string))
+    })
+  }, [toDos])
+
   return (
   <>
     <GlobalStyle/>
@@ -74,6 +120,14 @@ function App() {
           {Object.keys(toDos).map((boardId) => (
             <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
           ))}
+          <Form onSubmit={handleSubmit(onValid)}>
+            <input
+              {...register("category", { required: true })}
+              type="text"
+              placeholder={`Add Category`}
+            />
+            <Button>➕</Button>
+          </Form>
         </Boards>
       </Wrapper>
     </DragDropContext>

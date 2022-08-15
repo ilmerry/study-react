@@ -4,6 +4,7 @@ import styled from "styled-components";
 import DragabbleCard from "./DraggableCard";
 import { ITodo, toDoState } from "../atoms";
 import { useSetRecoilState } from "recoil";
+import { useEffect } from "react";
 
 const Wrapper = styled.div`
     width: 300px;
@@ -45,18 +46,18 @@ interface IAreaProps {
     isDraggingOver: boolean;
   }
   
-  const Area = styled.div<IAreaProps>`
-    background-color: ${(props) =>
-        props.isDraggingOver
-        ? "transparent"
-        : props.isDraggingFromThis
-        ? "transparent"
-        : "transparent"
-    };
-    flex-grow: 1;
-    transition: background-color 0.3s ease-in-out;
-    padding: 20px;
-  `;
+const Area = styled.div<IAreaProps>`
+  background-color: ${(props) =>
+      props.isDraggingOver
+      ? "transparent"
+      : props.isDraggingFromThis
+      ? "transparent"
+      : "transparent"
+  };
+  flex-grow: 1;
+  transition: background-color 0.3s ease-in-out;
+  padding: 20px;
+`;
 
 function Board({ toDos, boardId }: IBoardProps) {
   const setToDos = useSetRecoilState(toDoState);
@@ -74,6 +75,7 @@ function Board({ toDos, boardId }: IBoardProps) {
     });
     setValue("toDo", "");
   }
+  
   return (
     <Wrapper>
     <Title>{boardId}</Title>
@@ -83,7 +85,7 @@ function Board({ toDos, boardId }: IBoardProps) {
           type="text"
           placeholder={`Add task on ${boardId}`}
         />
-      </Form>
+    </Form>
     <Droppable droppableId={boardId}>
       {(magic, info) => (
         <Area isDraggingOver={info.isDraggingOver}
